@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #button {
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            padding: 10px 20px;
+            z-index: 10;
+            /* ボタンのz-indexを10に設定 */
+            width: 350px;
+            height: 120px;
+            border-radius: 20px;
+            /* 角丸を20pxに設定 */
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            /* フォントの太さをboldに設定 */
+        }
+
+        #emoji {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25rem;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        #topic {
+            position: absolute;
+            top: 8%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: black;
+            text-align: center;
+            z-index: 10;
+            white-space: nowrap;
+            /* 改行を無視するnowrapを設定 */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #timer {
+            font-size: 80px;
+            margin-top: 50px;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="button-container">
+        <button id="button">発話衝突ボタン</button>
+        <div id="emoji">👏</div>
+    </div>
+    <div id="topic">〇〇を一つに決めてください</div>
+    <button id="startTimer">Start Timer</button>
+    <div id="timer">5:00</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+
+        const button = document.getElementById('button');
+        const emoji = document.getElementById('emoji');
+
+        button.addEventListener('click', () => {
+            emoji.style.opacity = 1;
+            socket.emit("good button", emoji.style.opacity)
+            setTimeout(() => {
+                emoji.style.opacity = 0;
+            }, 3000);
+        });
+
+        socket.on("good button", function (gob) {
+            emoji.style.opacity = gob;
+            setTimeout(() => {
+                emoji.style.opacity = 0;
+            }, 2800);
+        })
+
+
+        document.querySelector('#startTimer').addEventListener('click', () => {
+            socket.emit('startTimer');
+        });
+
+        socket.on('updateTimer', (currentTime) => {
+            document.querySelector('#timer').textContent = currentTime;
+        });
+
+    </script>
+</body>
+
+</html>
